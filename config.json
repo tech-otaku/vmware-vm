@@ -1,0 +1,5 @@
+{
+    "vmpath": "/Users/steve/VMware/VMs",
+    "isopath": "/Users/steve/VMware/OS Images",
+    "sharedhost": "/Users/steve/.ssh"
+}

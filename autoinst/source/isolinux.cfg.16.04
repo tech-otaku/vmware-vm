@@ -1,0 +1,7 @@
+default linux
+prompt 0
+timeout 1
+
+label linux
+	kernel vmlinuz
+	append initrd=initrd file=/cdrom/preseed/ubuntu.seed boot=casper quiet splash ---  debian-installer/custom-installation=/custom find_preseed=/preseed.cfg auto preseed/file=/floppy/preseed.cfg automatic-ubiquity noprompt priority=critical locale=en_GB console-setup/modelcode=evdev
