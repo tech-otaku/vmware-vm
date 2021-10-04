@@ -271,7 +271,7 @@ cat << EOF > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 	#extendedConfigFile = "${NAME}.vmxf"							# VMware adds this line if omitted
 
 # OPTIONAL
-    ulm.disableMitigations = "TRUE"                                 # Settings > Other > Advanced > Disable Side Channel Mitigations
+    ulm.disableMitigations = "TRUE"                                 # Synonymous with 'Disable Side Channel Mitigations'. Checked if TRUE, unchecked if omitted or FALSE.
 	#mks.enable3d = "TRUE"
 	#pciBridge0.present = "TRUE"									
 	#pciBridge4.present = "TRUE"
