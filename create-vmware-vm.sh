@@ -271,6 +271,7 @@ cat << EOF > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 	#extendedConfigFile = "${NAME}.vmxf"							# VMware adds this line if omitted
 
 # OPTIONAL
+    ulm.disableMitigations = "TRUE"                                 # Settings > Other > Advanced > Disable Side Channel Mitigations
 	#mks.enable3d = "TRUE"
 	#pciBridge0.present = "TRUE"									
 	#pciBridge4.present = "TRUE"
@@ -428,7 +429,9 @@ if [ ! -z $EASY ]; then
     #cp autoinst.flp "${VMPATH}/${NAME}.vmwarevm/autoinst.flp"
 
     # Create autoinst.iso
-    if [[ $ISO == *"ubuntu-20"* ]]; then 
+    if [[ $ISO == *"ubuntu-21"* ]]; then 
+        cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.21.04" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
+    elif [[ $ISO == *"ubuntu-20"* ]]; then 
         cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.20.04" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
     elif [[ $ISO == *"ubuntu-18"* ]]; then
         cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.18.04" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
