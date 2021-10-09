@@ -29,6 +29,9 @@ USER_TO_TARGET=$1
 #    and runs the '/home/USER_TO_TARGET/userconf.sh' script. Makes the launcher 
 #    executable and changes ownership from 'root' to USER_TO_TARGET.
 #
+# 4. Create the file '/home/$USER_TO_TARGET/.config/gnome-initial-setup-done'. This prevents the
+#    display of the Welcome Screen on initial login.
+#
 # All tasks are performed as 'root'
 
 
@@ -66,6 +69,11 @@ EOF
 # Change ownership of '/home/$USER_TO_TARGET/.config/autostart/userconf.desktop' from 'root' to '$USER_TO_TARGET' and make it executable.
 chown $USER_TO_TARGET /home/$USER_TO_TARGET/.config/autostart/userconf.desktop
 chmod +x /home/$USER_TO_TARGET/.config/autostart/userconf.desktop
+
+
+# Prevent the display of the Welcome Screen on initial login
+# See https://askubuntu.com/a/1289934
+touch /home/$USER_TO_TARGET/.config/gnome-initial-setup-done
 
 
 
