@@ -20,3 +20,4 @@ test.sh
 autoinst/source/preseed.cfg.tmp
 Untitled-1.sh
 autoinst/cdrom/USERCONF.SH
+install-dash-to-dock.sh

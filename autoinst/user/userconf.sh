@@ -36,6 +36,12 @@
 VERSION=$(lsb_release -r | awk '{print $2}' | cut -d '.' -f 1)
 
 
+# Get the installed GNOME Desktop version
+GD_MAJOR=$(cat /usr/share/gnome/gnome-version.xml | sed -n 's/^.*<platform>//p' | sed -n 's/<\/platform>//p')
+GD_MINOR=$(cat /usr/share/gnome/gnome-version.xml | sed -n 's/^.*<minor>//p' | sed -n 's/<\/minor>//p')
+GD_MICRO=$(cat /usr/share/gnome/gnome-version.xml | sed -n 's/^.*<micro>//p' | sed -n 's/<\/micro>//p')
+
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # AUTHENTICATION AS ROOT
@@ -115,6 +121,17 @@ amixer cset iface=MIXER,name="Master Playback Volume" 25 >/dev/null
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# SOFTWARE UPDATE
+#
+# 
+
+# Do not display a notification when updates are available.
+gsettings set com.ubuntu.update-notifier no-show-notifications true
+
+
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # EDIT USER'S .BASHRC
 #
 #
@@ -125,6 +142,11 @@ tee -a ~/.bashrc <<EOF
 
 # Message to display for each new Terminal window
 printf "Use control [ctrl] + \ for # character\n\n"
+
+EOF
+
+tee -a ~/.bashrc <<EOF
+alias update='sudo -- sh -c "apt update; apt upgrade -y; apt dist-upgrade -y; apt autoremove -y; apt autoclean -y"; if [ -f /var/run/reboot-required ]; then echo -e "\n* * * REBOOT REQUIRED * * *\n"; else echo -e "\n* * * No reboot required * * *\n"; fi'
 EOF
 
 #gsettings set org.gnome.desktop.input-sources sources  "[('xkb', 'gb'), ('xkb', 'gb+mac')]"
@@ -196,15 +218,22 @@ fi
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # DOCK CONFIGURATION
 #
-# The default Desktop environment is GNOME 3 whose dock (Dash) 
-# has been replaced by a fork of the 'dash-to-dock' GNOME Shell 
-# extension named 'ubuntu-dock'.
+# Since 18.04 LTS the default Desktop environment is GNOME 3 (GNOME 40
+# starting with 21.10) whose dash has been transformed in to a dock by
+# a fork of the 'dash-to-dock' GNOME Shell extension named 'ubuntu-dock'. 
+# 'gnome-extensions list' shows this as 'ubuntu-dock@ubuntu.com'. A good
+# explanation of the differences between dash and dock can be found at 
+# https://askubuntu.com/a/1332625
 
-gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false
-gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
-gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED
-gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 48
-gsettings set org.gnome.shell.extensions.dash-to-dock unity-backlit-items true
+    gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false           # centre's the Dock
+    gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
+    gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED       # default value
+    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 48         # default value
+
+if [ $GD_MAJOR -lt 40 ]; then
+    # Setting this appears to cause issues with GNOME 40 and Ubuntu 21.10 where only the Applications Overview grid is displayed in the dock and may also result in crashing the GNOME shell.
+    gsettings set org.gnome.shell.extensions.dash-to-dock unity-backlit-items true      
+fi
 
 
 
@@ -262,6 +291,9 @@ else
     sudo apt install -y chromium-browser
 fi
 
+# Dconf Editor
+sudo apt-get install dconf-editor -y
+
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -273,8 +305,8 @@ if [ $VERSION -ge 20 ]; then
     CHROMIUM="'chromium_chromium.desktop'"
     SWUPDATE="'snap-store_ubuntu-software.desktop'"
 else
-    SWUPDATE="'org.gnome.Software.desktop'"
     CHROMIUM="'chromium-browser.desktop'"
+    SWUPDATE="'org.gnome.Software.desktop'"
 fi
 
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Terminal.desktop', $CHROMIUM, 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'update-manager.desktop', $SWUPDATE, 'gnome-control-center.desktop', 'yelp.desktop']"
