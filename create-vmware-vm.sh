@@ -429,9 +429,14 @@ if [ ! -z $EASY ]; then
     #cp autoinst.flp "${VMPATH}/${NAME}.vmwarevm/autoinst.flp"
 
     # Create autoinst.iso
-    if [[ $ISO == *"ubuntu-21"* ]]; then 
+    # The only difference between these files is that both isolinux.cfg.16.04 and isolinux.cfg.18.04 contain 'boot=casper' and the rest do not.
+    if [[ $ISO == *"ubuntu-21.10"* ]]; then 
+        cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.21.10" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
+    elif [[ $ISO == *"ubuntu-21.04"* ]]; then 
         cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.21.04" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
-    elif [[ $ISO == *"ubuntu-20"* ]]; then 
+    elif [[ $ISO == *"ubuntu-20.10"* ]]; then 
+        cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.20.10" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
+    elif [[ $ISO == *"ubuntu-20.04"* ]]; then 
         cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.20.04" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
     elif [[ $ISO == *"ubuntu-18"* ]]; then
         cp -p "${SCRIPTPATH}/autoinst/source/isolinux.cfg.18.04" "${SCRIPTPATH}/autoinst/cdrom/ISOLINUX/ISOLINUX.CFG"
@@ -498,19 +503,34 @@ fi
 
 #clear
 
-printf "Execution of script '${0##*/}' is paused and will continue after installation of the guest OS has completed and the VM has powered-off"
+printf "\n* * * DO NOT CLOSE THIS SHELL * * * \n\nExecution of script '${0##*/}' is paused and will continue after installation of the guest OS has completed and the VM has powered-off:\n\n"
+
 
 n=0
 while /Applications/VMware\ Fusion.app/Contents/Library/vmrun -T fusion list | grep -q "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"; do
-	for ((i = 1; i < 10; ++i)); do 
-		sleep 1
+	printf $n
+	for i in $(seq $((n+1)) $((n+9))); do 
+		sleep .7
+		printf " ."
+		sleep .1
 		printf "."
+		sleep .1
+		printf "."
+		sleep .1
+		printf "$i"
+		((n=n+1))
 	done
-	((n=n+i))
-	sleep 1
-	printf ${n}
+	((n=n+1))
+	sleep .5
+	printf " ."
+	sleep .1
+	printf "."
+	sleep .1
+	printf "."
+	sleep .3
+	# \033[2K = delete the entire line, \r = place the cursor at the beginning of the line
+	printf "\033[2K\r"
 done
-
 
 
 # # # # # # # # # # # # # # # # 
