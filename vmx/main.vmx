@@ -1,0 +1,170 @@
+# # # # # # # # # # # # # # # # 
+# REQUIRED
+#
+
+    # VMware adds this line at the beginning of the .vmx file, if omitted.
+        #.encoding = "UTF-8"
+
+    # "Error: Cannot open VM: /path/to/file.vmx, Cannot read the virtual machine configuration file", if omitted.
+        config.version = "8"
+
+    # "Error: Cannot open VM: /path/to/file.vmx, Cannot read the virtual machine configuration file", if omitted.
+        virtualHW.version = "18"
+
+    # "The configuration file does not specify a guest operating system", if omitted.
+        guestOS = "__GUEST__"
+
+    # "Not enough memory to load specific image" / "Could not find kernel image: vmlinuz", if omitted or value too low. Minimum value is 2048 MB
+        memsize = "__MEMORY__"
+
+    # Guest OS install errors-out with "No root file system", if omitted or FALSE.
+        scsi0.present = "TRUE"
+
+    # Defaults to 'buslogic', if omitted which errors-out with "The BusLogic SCSI adapter is not supported for 64-bit guests."
+        scsi0.virtualDev = "lsilogic"
+
+    # Guest OS install errors-out with "No root file system", if omitted or FALSE.
+        scsi0:0.present = "TRUE"
+
+    # VMware quits unexpectedly and script hangs, if omitted.
+        scsi0:0.fileName = "__VDISK__"
+
+    # Errors-out with "(initramfs) Unable to find a medium containing a live file system", if omitted or FALSE. Commented-out post-installation when CD/DVD drives are removed from the VM.
+        sata0.present = "TRUE"
+        sata0:1.present = "TRUE"
+
+    # WMware errors-out with "The file specified is not a virtual disk", if omitted. Commented-out post-installation when CD/DVD drives are removed from the VM.
+        sata0:1.deviceType = "cdrom-image"
+
+    # Errors-out with "(initramfs) Unable to find a medium containing a live file system", if omitted. Commented-out post-installation when CD/DVD drives are removed from the VM.
+        sata0:1.fileName = "__ISO__"
+
+    # Defaults to __VMPATH__/__NAME__.vmwarevm/__NAME__.vmx, if omitted.
+        displayName = "__NAME__"
+
+    # VMware adds this line if omitted
+        #virtualHW.productCompatibility = "hosted"
+
+    # VMware adds this line if omitted
+        #extendedConfigFile = "__NAME__.vmxf"
+
+
+
+# # # # # # # # # # # # # # # # 
+# OPTIONAL
+#
+
+    # Synonymous with 'Disable Side Channel Mitigations'. Checked if TRUE, unchecked if omitted or FALSE.
+        ulm.disableMitigations = "TRUE"
+
+        #mks.enable3d = "TRUE"
+        #pciBridge0.present = "TRUE"
+        #pciBridge4.present = "TRUE"
+        #pciBridge4.virtualDev = "pcieRootPort"
+        #pciBridge4.functions = "8"
+        #pciBridge5.present = "TRUE"
+        #pciBridge5.virtualDev = "pcieRootPort"
+        #pciBridge5.functions = "8"
+        #pciBridge6.present = "TRUE"
+        #pciBridge6.virtualDev = "pcieRootPort"
+        #pciBridge6.functions = "8"
+        #pciBridge7.present = "TRUE"
+        #pciBridge7.virtualDev = "pcieRootPort"
+        #pciBridge7.functions = "8"
+        #vmci0.present = "TRUE"
+        #hpet0.present = "TRUE"
+        #usb.vbluetooth.startConnected = "TRUE"
+        #nvram = "__NAME__.nvram"
+        #powerType.powerOff = "soft"
+        #powerType.powerOn = "soft"
+        #powerType.suspend = "soft"
+        #powerType.reset = "soft"
+        #tools.syncTime = "TRUE"
+        #tools.upgrade.policy = "upgradeAtPowerCycle"
+
+    # Allow CPU resources to be adjusted in a running VM
+        #vcpu.hotadd = "TRUE"
+
+    # Allow memory resources to be adjusted in a running VM
+        #mem.hotadd = "TRUE"
+
+        #usb.present = "TRUE"
+        #ehci.present = "TRUE"
+        #svga.graphicsMemoryKB = "786432"
+        ethernet0.present = "TRUE"
+        ethernet0.connectionType = "nat"
+        ethernet0.addressType = "generated"
+        ethernet0.virtualDev = "e1000"
+        ethernet0.linkStatePropagation.enable = "TRUE"
+        #serial0.present = "TRUE"
+        #serial0.fileType = "thinprint"
+        #serial0.fileName = "thinprint"
+        #ehci:0.parent = "-1"
+        #ehci:0.port = "0"
+        #ehci:0.deviceType = "video"
+        #ehci:0.present = "TRUE"
+
+
+
+# # # # # # # # # # # # # # # # 
+# SOUND
+#
+        sound.present = "TRUE"
+        sound.autoDetect = "TRUE"
+        sound.fileName = "-1"
+        sound.pciSlotNumber = "19"
+
+
+
+# # # # # # # # # # # # # # # # 
+# ADDITIONAL
+#
+
+    # Synonymous with 'Use full resoltion for Retina display'. Checked if TRUE, unchecked if omitted or FALSE.
+        #gui.fitGuestUsingNativeDisplayResolution = "TRUE"
+
+    # Synonymous with 'n processor core(s)'. Defaults to 1, if omitted.
+        numvcpus = "__CPUS__"
+
+    # In the guest OS use 'vmtoolsd --cmd machine.id.get' (or 'vmware-rpctool machine.id.get') to get value of 'machone.id'.
+        machine.id= "__NAME__"
+
+        isolation.tools.machine.id.get.disable = "TRUE"
+
+
+
+# # # # # # # # # # # # # # # # 
+# SHARED FOLDERS
+#
+# Each shared folder is given a different ID, e.g. sharedFolder0, sharedFolder1 etc.
+#
+
+    # Synonymous with 'Enable Shared Folders'. "TRUE" if unchecked or omitted.
+        isolation.tools.hgfs.disable = "FALSE"
+
+    # Synonymous with 'Enable Shared Folders'. "FALSE" if unchecked or omitted.
+        hgfs.mapRootShare = "TRUE"
+
+    # Synonymous with 'Enable Shared Folders'. "FALSE" if unchecked or omitted.
+        hgfs.linkRootShare = "TRUE"
+
+    # Folder added to list of shared folders. "FALSE" if a previously defined shared folder has been removed from the list.
+        sharedFolder0.present = "TRUE"
+
+    # Synonymous with 'On'. FALSE if checked or omitted.
+        sharedFolder0.enabled = "TRUE"
+
+    # Synonymous with 'Permissions'.
+        sharedFolder0.readAccess = "TRUE"
+
+    # Synonymous with 'Permissions'. "FALSE" if 'read-only'
+        sharedFolder0.writeAccess = "TRUE"
+
+    # Path to shared folder
+        sharedFolder0.hostPath = "__SHAREDHOST__"
+
+    # Name to identify the shared folder on the guest OS
+        sharedFolder0.guestName = ".ssh"
+
+        sharedFolder0.expiration = "never"
+        sharedFolder.maxNum = "1"

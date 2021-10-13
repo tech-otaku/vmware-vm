@@ -1,0 +1,15 @@
+# # # # # # # # # # # # # # # # 
+# UNATTENDED (EASY) INSTALL
+#
+
+    # Implied TRUE if omitted. Must explicitly be set to FALSE if not using 'autoinst.flp'
+        floppy0.present = "TRUE"
+
+        floppy0.fileType = "file"
+        floppy0.fileName = "autoinst.flp"
+        floppy0.clientDevice = "FALSE"
+        
+    # Commented-out post-installation when CD/DVD drives are removed from the VM.
+        sata0:0.present = "TRUE"
+        sata0:0.deviceType = "cdrom-image"
+        sata0:0.fileName = "autoinst.iso"

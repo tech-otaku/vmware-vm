@@ -17,6 +17,7 @@ disk.sh
 POSTINST.SH
 PRESEED.CFG.new
 test.sh
+timer.sh
 autoinst/source/preseed.cfg.tmp
 Untitled-1.sh
 autoinst/cdrom/USERCONF.SH

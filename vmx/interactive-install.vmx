@@ -1,0 +1,8 @@
+# # # # # # # # # # # # # # # # 
+# # INTERACTIVE INSTALL
+#
+
+     # "Could not connect to floppy '/dev/fd/0'. Virtual device 'floppy0' will start disconnected.", if omitted or TRUE
+         floppy0.present = "FALSE"
+
+         sata0:0.present = "FALSE"
