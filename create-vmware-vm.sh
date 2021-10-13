@@ -41,6 +41,8 @@
         for disk in $(diskutil list | grep "disk image" | cut -d ' ' -f1); do
             diskutil eject $disk
         done
+
+        tput cnorm  # Normal cursor
     }
 
 # Function to display usage help
@@ -251,131 +253,37 @@ fi
 # .VMX CONFIGURATION FILE
 #
 
-cat << EOF > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
-# REQUIRED
-	#.encoding = "UTF-8"											# VMware adds this line at the beginning of the .vmx file, if omitted.
-	config.version = "8"											# REQUIRED. "Error: Cannot open VM: /path/to/file.vmx, Cannot read the virtual machine configuration file", if omitted.
-	virtualHW.version = "18"										# REQUIRED. "Error: Cannot open VM: /path/to/file.vmx, Cannot read the virtual machine configuration file", if omitted.
-	guestOS = "${GUEST}"											# REQUIRED. "The configuration file does not specify a guest operating system", if omitted.
-	memsize = "${MEMORY}"											# REQUIRED. "Not enough memory to load specific image" / "Could not find kernel image: vmlinuz", if omitted or value too low. Minimum value is 2048 MB
-	scsi0.present = "TRUE"											# REQUIRED. Guest OS install errors-out with "No root file system", if omitted or FALSE.
-	scsi0.virtualDev = "lsilogic"									# REQUIRED. Defaults to 'buslogic', if omitted which errors-out with "The BusLogic SCSI adapter is not supported for 64-bit guests."
-	scsi0:0.present = "TRUE"										# REQUIRED. Guest OS install errors-out with "No root file system", if omitted or FALSE.
-	scsi0:0.fileName = "${VDISK}"									# REQUIRED. VMware quits unexpectedly and script hangs, if omitted. 
-	sata0.present = "TRUE"
-	sata0:1.present = "TRUE"										# REQUIRED. Errors-out with "(initramfs) Unable to find a medium containing a live file system", if omitted or FALSE.
-	sata0:1.deviceType = "cdrom-image"								# REQUIRED. WMware errors-out with "The file specified is not a virtual disk", if omitted.
-	sata0:1.fileName = "${ISO}"										# REQUIRED. Errors-out with "(initramfs) Unable to find a medium containing a live file system", if omitted.
-	displayName = "${NAME}"											# Defaults to ${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx, if omitted.
-	#virtualHW.productCompatibility = "hosted"						# VMware adds this line if omitted
-	#extendedConfigFile = "${NAME}.vmxf"							# VMware adds this line if omitted
+cat vmx/main.vmx > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 
-# OPTIONAL
-    ulm.disableMitigations = "TRUE"                                 # Synonymous with 'Disable Side Channel Mitigations'. Checked if TRUE, unchecked if omitted or FALSE.
-	#mks.enable3d = "TRUE"
-	#pciBridge0.present = "TRUE"									
-	#pciBridge4.present = "TRUE"
-	#pciBridge4.virtualDev = "pcieRootPort"
-	#pciBridge4.functions = "8"
-	#pciBridge5.present = "TRUE"
-	#pciBridge5.virtualDev = "pcieRootPort"
-	#pciBridge5.functions = "8"
-	#pciBridge6.present = "TRUE"
-	#pciBridge6.virtualDev = "pcieRootPort"
-	#pciBridge6.functions = "8"
-	#pciBridge7.present = "TRUE"
-	#pciBridge7.virtualDev = "pcieRootPort"
-	#pciBridge7.functions = "8"
-	#vmci0.present = "TRUE"
-	#hpet0.present = "TRUE"
-	#usb.vbluetooth.startConnected = "TRUE"
-	#nvram = "${NAME}.nvram"
-	#powerType.powerOff = "soft"
-	#powerType.powerOn = "soft"
-	#powerType.suspend = "soft"
-	#powerType.reset = "soft"
-	#tools.syncTime = "TRUE"
-	#tools.upgrade.policy = "upgradeAtPowerCycle"
-	
-# SOUND
-	sound.present = "TRUE"
-	sound.autoDetect = "TRUE"
-	sound.fileName = "-1"
-	sound.pciSlotNumber = "19"
-	
-	#vcpu.hotadd = "TRUE"											# Adjust CPU resources to a running VM
-	#mem.hotadd = "TRUE"											# Adjust memory resources to a running VM
-	#usb.present = "TRUE"
-	#ehci.present = "TRUE"
-	#svga.graphicsMemoryKB = "786432"
-	ethernet0.connectionType = "nat"
-	ethernet0.addressType = "generated"
-	ethernet0.virtualDev = "e1000"
-	ethernet0.linkStatePropagation.enable = "TRUE"
-	#serial0.fileType = "thinprint"
-	#serial0.fileName = "thinprint"
-	ethernet0.present = "TRUE"
-	#serial0.present = "TRUE"
-	#ehci:0.parent = "-1"
-	#ehci:0.port = "0"
-	#ehci:0.deviceType = "video"
-	#ehci:0.present = "TRUE"
-	
-# ADDITIONAL
-	#gui.fitGuestUsingNativeDisplayResolution = "TRUE"			    # Synonymous with 'Use full resoltion for Retina display'. Checked if TRUE, unchecked if omitted or FALSE.
-	numvcpus = "${CPUS}"											# Synonymous with 'n processor core(s)'. Defaults to 1, if omitted.
-	machine.id= "${NAME}"											# In the guest OS use 'vmtoolsd --cmd machine.id.get' (or 'vmware-rpctool machine.id.get') to get this value.
-	isolation.tools.machine.id.get.disable = "TRUE"							
-	
-
-# SHARED FOLDERS - Each shared folder is given a different ID, e.g. sharedFolder0, sharedFolder1 etc.
-	isolation.tools.hgfs.disable = "FALSE"							# Synonymous with 'Enable Shared Folders'. "TRUE" if unchecked or omitted.
-	hgfs.mapRootShare = "TRUE"										# Synonymous with 'Enable Shared Folders'. "FALSE" if unchecked or omitted.
-	hgfs.linkRootShare = "TRUE"										# Synonymous with 'Enable Shared Folders'. "FALSE" if unchecked or omitted.
-	sharedFolder0.present = "TRUE"									# Folder added to list of shared folders. "FALSE" if a previously defined shared folder has been removed from the list.
-	sharedFolder0.enabled = "TRUE"									# Synonymous with 'On'. FALSE if checked or omitted.
-	sharedFolder0.readAccess = "TRUE"								# Synonymous with 'Permissions'. 
-	sharedFolder0.writeAccess = "TRUE"								# Synonymous with 'Permissions'. "FALSE" if 'read-only'
-	sharedFolder0.hostPath = "${SHAREDHOST}"						# Path to shared folder
-	sharedFolder0.guestName = ".ssh"								# Name to identify the shared folder on the guest OS
-	sharedFolder0.expiration = "never"
-	sharedFolder.maxNum = "1"
-	
-EOF
+printf "\n\n\n" >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 
 if [ ! -z $EASY ]; then 
 
-	cat << EOF >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
-
-# UNATTENDED (EASY) INSTALL
-
-	#floppy0.present = "FALSE"										# Implied TRUE if omitted. Must explicitly be set to FALSE if not using 'autoinst.flp'
-	floppy0.present = "TRUE"										
-	floppy0.fileType = "file"
-	floppy0.fileName = "autoinst.flp"
-	floppy0.clientDevice = "FALSE"
-	sata0:0.present = "TRUE"
-	sata0:0.deviceType = "cdrom-image"
-	sata0:0.fileName = "autoinst.iso"
-EOF
+	cat vmx/easy-install.vmx >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 
 else
 
-	cat << EOF >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
-
-# INTERACTIVE INSTALL
-  
-	floppy0.present = "FALSE"										# "Could not connect to floppy '/dev/fd/0'. Virtual device 'floppy0' will start disconnected.", if omitted or TRUE
-	sata0:0.present = "FALSE"
-EOF
+	cat vmx/interactive-install.vmx >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 
 fi
 
-cat << EOF >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
+printf "\n\n\n" >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 
+cat << EOF >> "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 # * * * * ANYTHING APPEARING BELOW THIS LINE IS AUTO-ADDED BY VMWARE * * * *
 
 EOF
+
+sed -i '' \
+-e "s|__CPUS__|$CPUS|g" \
+-e "s|__GUEST__|$GUEST|g" \
+-e "s|__ISO__|$ISO|g" \
+-e "s|__MEMORY__|$MEMORY|g" \
+-e "s|__NAME__|$NAME|g" \
+-e "s|__SHAREDHOST__|$SHAREDHOST|g" \
+-e "s|__VDISK__|$VDISK|g" \
+-e "s|__VMPATH__|$VMPATH|g" \
+"${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 
 
 
@@ -505,48 +413,30 @@ fi
 
 printf "\n* * * DO NOT CLOSE THIS SHELL * * * \n\nExecution of script '${0##*/}' is paused and will continue after installation of the guest OS has completed and the VM has powered-off:\n\n"
 
-
-n=0
+date1=$(date +%s)
+tput civis  # Hide cursor 
 while /Applications/VMware\ Fusion.app/Contents/Library/vmrun -T fusion list | grep -q "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"; do
-	printf $n
-	for i in $(seq $((n+1)) $((n+9))); do 
-		sleep .7
-		printf " ."
-		sleep .1
-		printf "."
-		sleep .1
-		printf "."
-		sleep .1
-		printf "$i"
-		((n=n+1))
-	done
-	((n=n+1))
-	sleep .5
-	printf " ."
-	sleep .1
-	printf "."
-	sleep .1
-	printf "."
-	sleep .3
-	# \033[2K = delete the entire line, \r = place the cursor at the beginning of the line
-	printf "\033[2K\r"
+    # See https://superuser.com/a/901013
+    echo -ne "Elapsed time: $(date -ujf "%s" $(($(date +%s) - $date1)) +%M:%S)\r"
 done
+printf "\033[2K\r"
+tput cnorm  # Normal cursor
+
 
 
 # # # # # # # # # # # # # # # # 
 # FINISH-UP
 #
 
-echo ""
-
-read -p "$(echo -e '\nVM has powered-off. Run Post-Install Cleanup (y/N)? ')" POSTINST
+read -p "$(echo -e 'VM has powered-off. Run Post-Install Cleanup (y/N)? ')" POSTINST
 if [[ ! $POSTINST =~ "N" ]]; then
 	if [ ! $( /Applications/VMware\ Fusion.app/Contents/Library/vmrun -T ws list | grep -q "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx") ]; then
 		echo "Running Post-Install Cleanup..."
 		read -p "Remove SATA CD/DVD drives from VM (y/N)? " SATA
 		if [[ ! $SATA =~ "N" ]]; then
 			mv "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx" "${VMPATH}/${NAME}.vmwarevm/${NAME}.tmp"
-			grep -vE "sata" "${VMPATH}/${NAME}.vmwarevm/${NAME}.tmp" > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
+#			grep -vE "sata" "${VMPATH}/${NAME}.vmwarevm/${NAME}.tmp" > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
+            sed -r 's/^(.*)sata/\1#sata/g' "${VMPATH}/${NAME}.vmwarevm/${NAME}.tmp" > "${VMPATH}/${NAME}.vmwarevm/${NAME}.vmx"
 			echo "SATA CD/DVD drives removed."
 		fi
 		read -p "Enable 'Use full resolution for Retina display' for VM (y/N)? " RETINA
