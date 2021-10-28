@@ -9,7 +9,7 @@
         config.version = "8"
 
     # "Error: Cannot open VM: /path/to/file.vmx, Cannot read the virtual machine configuration file", if omitted.
-        virtualHW.version = "18"
+        virtualHW.version = "19"
 
     # "The configuration file does not specify a guest operating system", if omitted.
         guestOS = "__GUEST__"
