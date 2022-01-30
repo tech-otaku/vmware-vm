@@ -160,7 +160,7 @@ sata0:0.fileName = "autoinst.iso"
 
 
 
-<img src="https://github.com/tech-otaku/vmware-vm/blob/master/Ubuntu%20Desktop%2020.04.png" width="795" height="564">
+<img src="https://raw.githubusercontent.com/tech-otaku/vmware-vm/main/Ubuntu%20Desktop%2020.04.png" width="795" height="564">
 
 ### Tested With
 _Host_
