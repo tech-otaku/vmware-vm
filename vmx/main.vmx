@@ -158,7 +158,7 @@
         sharedFolder0.readAccess = "TRUE"
 
     # Synonymous with 'Permissions'. "FALSE" if 'read-only'
-        sharedFolder0.writeAccess = "TRUE"
+        sharedFolder0.writeAccess = "FALSE"
 
     # Path to shared folder
         sharedFolder0.hostPath = "__SHAREDHOST__"
