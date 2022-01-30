@@ -108,6 +108,7 @@ sudo update-grub
 # SOURCE: https://ubuntuforums.org/showthread.php?t=2384128&p=13736478#post13736478
 
 gsettings set org.gnome.desktop.interface scaling-factor 2
+#dconf write /org/gnome/desktop/interface/scaling-factor "uint32 2"
 
 
 
@@ -125,8 +126,13 @@ amixer cset iface=MIXER,name="Master Playback Volume" 25 >/dev/null
 #
 # 
 
+# Software Updater > Settings & Livepatch > Updates > Automatically check for updates:
+    # Never
+    sudo sed -r -i 's/(Update-Package-Lists).*;/\1 "0";/' /etc/apt/apt.conf.d/20auto-upgrades
+
 # Do not display a notification when updates are available.
 gsettings set com.ubuntu.update-notifier no-show-notifications true
+#dconf write /com/ubuntu/update-notifier/no-show-notifications true
 
 
 
@@ -150,6 +156,7 @@ alias update='sudo -- sh -c "apt update; apt upgrade -y; apt dist-upgrade -y; ap
 EOF
 
 #gsettings set org.gnome.desktop.input-sources sources  "[('xkb', 'gb'), ('xkb', 'gb+mac')]"
+#dconf write /org/gnome/desktop/input-sources/sources "[('xkb', 'gb'), ('xkb', 'gb+mac')]"
 
 
 
@@ -160,16 +167,19 @@ EOF
 
 # Show hidden files
 gsettings set org.gtk.Settings.FileChooser show-hidden true
+#dconf write /org/gtk/settings/file-chooser/show-hidden true        # Note difference in case and schema name compared to gsettings
 
 # Set default to 'List' view 
-gsettings set org.gnome.nautilus.preferences default-folder-viewer "'list-view'"
+gsettings set org.gnome.nautilus.preferences default-folder-viewer list-view
+#dconf write /org/gnome/nautilus/preferences/default-folder-viewer "'list-view'"
 
 # Limit 'List' view columns
 gsettings set org.gnome.nautilus.list-view default-visible-columns "['name', 'size', 'date_modified']"
+#dconf write /org/gnome/nautilus/list-view/default-visible-columns "['name', 'size', 'date_modified']"
 
 # Use Tree view
 gsettings set org.gnome.nautilus.list-view use-tree-view true
-
+#dconf write /org/gnome/nautilus/list-view/use-tree-view true
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -178,7 +188,7 @@ gsettings set org.gnome.nautilus.list-view use-tree-view true
 # 
 
 gsettings set org.gnome.desktop.peripherals.mouse natural-scroll false
-
+#dconf write /org/gnome/desktop/peripherals/mouse/natural-scroll false
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -188,15 +198,15 @@ gsettings set org.gnome.desktop.peripherals.mouse natural-scroll false
 
 # Disable automatic screen lock
 gsettings set org.gnome.desktop.screensaver lock-enabled false
-
+#dconf write /org/gnome/desktop/screensaver/lock-enabled false
 
 # Enable automatic screen lock
 #gsettings set org.gnome.desktop.screensaver lock-enabled true
-
+#dconf write /org/gnome/desktop/screensaver/lock-enabled true
 
 # Lock screen after 30 minutes
-#gsettings set org.gnome.desktop.screensaver lock-delay uint32 1800
-
+#gsettings set org.gnome.desktop.screensaver lock-delay 1800
+#dconf write /org/gnome/desktop/screensaver/lock-delay "uint32 1800"                                                         # Unsigned 32-bit integer
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -205,12 +215,22 @@ gsettings set org.gnome.desktop.screensaver lock-enabled false
 # 
 
 # Change keyboard shortcut to open Terminal
-if [ $VERSION -ge 20 ]; then 
-    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Alt><Super>t']"             # option-command-t on macOS
-    #gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']"           # control-option-t on macOS. Conflicts with Magnet's 'Right Two Thirds' option
+if [ $VERSION -ge 20 ]; then
+    # option-command-t on macOS
+    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Alt><Super>t']"
+    #dconf write /org/gnome/settings-daemon/plugins/media-keys/terminal "['<Alt><Super>t']"
+
+    # control-option-t on macOS. Conflicts with Magnet's 'Right Two Thirds' option
+    #gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "['<Primary><Alt>t']"           
+    #dconf write /org/gnome/settings-daemon/plugins/media-keys/terminal "['<Primary><Alt>t']"
 else
-    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "'<Alt><Super>t'"             # option-command-t on macOS
-    #gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "'<Primary><Alt>t'"           # control-option-t on macOS. Conflicts with Magnet's 'Right Two Thirds' option
+    # option-command-t on macOS
+    gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "'<Alt><Super>t'"             
+    #dconf write /org/gnome/settings-daemon/plugins/media-keys/terminal "'<Alt><Super>t'"
+
+    # control-option-t on macOS. Conflicts with Magnet's 'Right Two Thirds' option
+    #gsettings set org.gnome.settings-daemon.plugins.media-keys terminal "'<Primary><Alt>t'"           
+    #dconf write /org/gnome/settings-daemon/plugins/media-keys/terminal "'<Primary><Alt>t'"
 fi    
 
 
@@ -225,14 +245,22 @@ fi
 # explanation of the differences between dash and dock can be found at 
 # https://askubuntu.com/a/1332625
 
-    gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false           # centre's the Dock
+    gsettings set org.gnome.shell.extensions.dash-to-dock extend-height false           # Centres the Dock
+    #dconf write /org/gnome/shell/extensions/dash-to-dock/extend-height false
+
     gsettings set org.gnome.shell.extensions.dash-to-dock dock-position BOTTOM
-    gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED       # default value
-    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 48         # default value
+    #dconf write /org/gnome/shell/extensions/dash-to-dock/dock-position "'BOTTOM'"
+
+    gsettings set org.gnome.shell.extensions.dash-to-dock transparency-mode FIXED       # Default value
+    #dconf write /org/gnome/shell/extensions/dash-to-dock/transparency-mode "'FIXED'"
+
+    gsettings set org.gnome.shell.extensions.dash-to-dock dash-max-icon-size 48         # Signed 32-bit integer. Default value
+    #dconf write /org/gnome/shell/extensions/dash-to-dock/dash-max-icon-size "48"
 
 if [ $GD_MAJOR -lt 40 ]; then
     # Setting this appears to cause issues with GNOME 40 and Ubuntu 21.10 where only the Applications Overview grid is displayed in the dock and may also result in crashing the GNOME shell.
-    gsettings set org.gnome.shell.extensions.dash-to-dock unity-backlit-items true      
+    gsettings set org.gnome.shell.extensions.dash-to-dock unity-backlit-items true
+    #dconf write /org/gnome/shell/extensions/dash-to-dock/unity-backlit-items true
 fi
 
 
@@ -310,6 +338,7 @@ else
 fi
 
 gsettings set org.gnome.shell favorite-apps "['org.gnome.Terminal.desktop', $CHROMIUM, 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'update-manager.desktop', $SWUPDATE, 'gnome-control-center.desktop', 'yelp.desktop']"
+#dconf write /org/gnome/shell/favorite-apps "['org.gnome.Terminal.desktop', $CHROMIUM, 'thunderbird.desktop', 'org.gnome.Nautilus.desktop', 'libreoffice-writer.desktop', 'update-manager.desktop', $SWUPDATE, 'gnome-control-center.desktop', 'yelp.desktop']"
 
 
 
@@ -320,17 +349,27 @@ gsettings set org.gnome.shell favorite-apps "['org.gnome.Terminal.desktop', $CHR
 
 # Get the default Terminal profile
 PROFILE=$(gsettings get org.gnome.Terminal.ProfilesList default | tr -d "'")
+#PROFILE=$(dconf list /org/gnome/terminal/legacy/profiles:/ | tr -d ":/" | grep "\S" | head -n 1)
 
-# Set the default Terminal profile name 
-dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/visible-name "'My Default'"
+# Set the default Terminal profile name
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ visible-name 'My Default'
+#dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/visible-name "'My Default'"
 
-# Set the default Terminal font 
-dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/font "'Source Code Pro 12'"
-dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/use-system-font false
+
+# Set the default Terminal font
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ font 'Source Code Pro 12'
+#dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/font "'Source Code Pro 12'"
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ use-system-font false
+#dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/use-system-font false
 
 # Set the default size for new Terminal windows
-dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/default-size-columns "98"
-dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/default-size-rows "32"                       # 98 / 3.06 = 32.03
+# Columns
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ default-size-columns 98			# Signed 32-bit integer
+#dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/default-size-columns "98"											# Signed 32-bit integer
+
+# Rows (98 / 3.06 = 32.03)
+gsettings set org.gnome.Terminal.Legacy.Profile:/org/gnome/terminal/legacy/profiles:/:$PROFILE/ default-size-rows 32			# Signed 32-bit integer
+#dconf write /org/gnome/terminal/legacy/profiles:/:$PROFILE/default-size-rows "32"												# Signed 32-bit integer   
 
 #
 # < < < < < < < < < < < < < < < < < < < < < < < < < < <   E N D   C U S T O M I S A T I O N   < < < < < < < < < < < < < < < < < < < < < < < < < < 
